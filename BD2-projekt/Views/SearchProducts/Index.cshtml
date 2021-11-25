@@ -1,0 +1,246 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+
+}
+<head>
+    <title>Szukaj</title>
+    <script>
+        var searchTypes = {}
+        var cartData = {}
+        var index = 1;
+
+        window.onload = function () {
+            document.getElementById("add-filter-select-"+0).addEventListener("change", (event) => {
+                if (document.getElementById("choose-element-" + 0) == null) {
+                    addFilterValue(0);
+                }
+                searchTypes["0"] = {
+                    "type":event.target.value
+                }
+            })
+            getCartData();
+        }
+
+        function updateCartNumbers() {
+            let elements = cartData.cartElements;
+            elements.forEach(element => {
+                let ID = element.product.productsID;
+                try {
+                    let doc = document.getElementById("cart-number-" + ID).innerHTML = element.numberOfProducts;
+                }
+                catch (e) {
+                    console.log(e);
+                }
+            })
+        }
+
+        function getCartData() {
+            var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+            var theUrl = '@Url.Action("getCartData")';
+            xmlhttp.open("GET", theUrl);
+            xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xmlhttp.onreadystatechange = function () {
+                let status = xmlhttp.status;
+                if (status === 0 || (status >= 200 && status < 400)) {
+                    try {
+                        cartData = JSON.parse(xmlhttp.responseText);
+                        updateCartNumbers();
+                    }
+                    catch (e) {
+                        console.log("error with JSON.parse");
+                    }
+                    
+                } else {
+
+                }
+            }
+            xmlhttp.send();
+        }
+
+        function addFilterValue(index_v) {
+            console.log(index_v);
+            let node = document.createElement('div');
+            node.setAttribute("id", "choose-element-" + index_v)
+            node.innerHTML =
+                "   <label for=choose-" + index_v + "'>wpisz wartość filtra</label> " +
+                "   <input type='text' name='choose-" + index_v + "'>"
+            document.getElementById("add-filter-select-" + index_v).parentElement.appendChild(node);
+
+
+        }
+
+        function addDeleteButton(index_v) {
+            let node = document.createElement('button');
+            node.classList.add("btn");
+            node.classList.add("btn-primary");
+            node.setAttribute("onClick", "deleteFilter(" + index_v + ")");
+            node.innerHTML = "Usuń";
+            document.getElementById("add-filter-select-" + index_v).parentElement.appendChild(node);
+        }
+
+        function deleteFilter(index_v) {
+            delete searchTypes[index_v];
+            document.getElementById("add-filter-select-" + index_v).parentElement.remove();
+        }
+
+        function addNewFilter() {
+            let index_v = index;
+            let node = document.createElement('div');
+            node.classList.add("search-form-inner");
+            node.innerHTML =
+                 "<div class='search-form-inner'>" +
+                "   <label for='add-filter-select-"+index_v+"'>Wybierz filtr wyszukiwania</label>" +
+                "   <select name='add-filter-select-"+index_v+"' id='add-filter-select-"+index_v+"'> " +
+                "       <option value='---' selected disabled>---</option> " +
+                "       <option value='name'>nazwa</option> " +
+                "       <option value='desc'>opis</option> " +
+                "       <option value='distributor'>producent</option> " +
+                "   </select>" +
+                "</div>";
+            document.getElementById("search-form").appendChild(node);
+
+            document.getElementById("add-filter-select-" + index_v).addEventListener("change", (event) => {
+                if (document.getElementById("choose-element-" + index_v) == null) {
+                    addFilterValue(index_v);
+                    addDeleteButton(index_v);
+                }
+                searchTypes[index_v] = {
+                    "type": event.target.value
+                }
+            })
+            index++;
+        }
+
+        function addToDatabase(ID) {
+            var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+            var theUrl = '@Url.Action("AddOrRemove")';
+            xmlhttp.open("POST", theUrl, true);
+            xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xmlhttp.send(JSON.stringify({ 'add': true, 'remove': false, 'ID': ID }));
+            xmlhttp.onreadystatechange = function () {
+                let status = xmlhttp.status;
+                if (status === 0 || (status >= 200 && status < 400)) {
+                    getCartData();
+                }
+                else {
+
+                }
+            }
+        }
+
+        function removeFromDatabase(ID) {
+            var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+            var theUrl = '@Url.Action("AddOrRemove")';
+            xmlhttp.open("POST", theUrl, true);
+            xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xmlhttp.send(JSON.stringify({ 'remove': true, 'add': false, 'ID': ID }));
+            xmlhttp.onreadystatechange = function () {
+                let status = xmlhttp.status;
+                if (status === 0 || (status >= 200 && status < 400)) {
+                    getCartData();
+                }
+                else {
+
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .search-form-inner  *{
+            display: inline-block;
+        }
+
+        .product-container{
+            margin: 20px auto 20px auto;
+            background-color: #ededed;
+            border-radius: 15px;
+            width: 70vw;
+        }
+        .desc{
+            background-color: #cdd0d4;
+            padding: 7px;
+            font-size: 18px;
+            border-radius: 7px;
+            width: 90%;
+            margin: auto;
+        }
+        .distributor{
+            display: inline-block;
+            padding: 5px;
+        }
+
+        .buy-container{
+            padding: 5px;
+            
+        }
+    </style>
+</head>
+
+<section>
+    @{ 
+        var products = (Products[])ViewData["products"];
+        var cart = (Cart)ViewData["cart"];
+        var data = (String)ViewData["session"];
+        var userType = (String)ViewData["userType"];
+    }
+    <button onclick="addNewFilter()" class="btn btn-primary">Dodaj Filtr</button>
+    <hr />
+    <form method="post" id="search-form" asp-controller="SearchProducts" asp-action="Search">
+        <input type="submit" value="szukaj" class="btn btn-primary" style="margin-left: 10%;" />
+        <div class="search-form-inner">
+            <label for="add-filter-select">Wybierz filtr wyszukiwania</label>
+            <select name="add-filter-select-0" id="add-filter-select-0">
+                <option value="---" selected disabled>---</option>
+                <option value="name">nazwa</option>
+                <option value="desc">opis</option>
+                <option value="distributor">producent</option>
+            </select>
+        </div>
+    </form>
+    <hr/>
+    <div id="results">
+        @{
+            if (products != null)
+            {
+                <h2>znaleziono @products.Length produktów</h2>
+                foreach (Products product in products)
+                {
+    <div class="product-container">
+        <h3 class="product-name">@product.ProductName</h3>
+        <h3 class="product-price">@product.price zł</h3>
+        <p class="short-desc">@product.ShortDescription</p>
+        <p class="desc">
+            Opis: <br>
+            @product.Description
+        </p>
+        <div>
+            <p class="distributor">producenci:</p>
+            @{
+                if (product.Distributors != null)
+                {
+                    foreach (Distributors distributor in product.Distributors)
+                    {
+                        <p class="distributor">@distributor.CompanyName,</p>
+                    }
+                }
+            }
+        </div>
+        <hr />
+        @if (data != null && data != "" && userType == "Customer")
+        {
+            <form class="buy-container">
+                <div>Aktualnie w koszyku: <p id="cart-number-@product.ProductsID" class="d-inline-block p-0"></p> produktów</div>
+                <div>
+                    <input type="button" class="btn btn-primary" value="+" name="add" onclick='addToDatabase(@product.ProductsID)' />
+                    <input type="button" class="btn btn-primary" value="-" name="remove" onclick='removeFromDatabase(@product.ProductsID)' />
+                </div>
+            </form>
+        }
+    </div>
+                }
+            }
+        }
+    </div>
+</section>

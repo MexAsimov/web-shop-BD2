@@ -1,0 +1,63 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+
+}
+<style>
+    .price{
+        padding: 3px;
+        border: 1px solid;
+        border-radius: 4px;
+        margin: 3px;
+        font-size: 18px;
+        background-color:antiquewhite;
+    }
+</style>
+
+<script>
+    @{ 
+        var success = (bool)ViewData["success"];
+        if(success)
+        {
+            @:function() { alert("Dziękujemy za udane zakupy!");}
+        }
+    }
+</script>
+
+<section>
+    @{ 
+        var cart = (Cart)ViewData["cart"];
+        CartElement[] cartElements = cart.CartElements.ToArray();
+    }
+    <form asp-area="" asp-controller="Buy" asp-action="Buy">
+        <p>Aktualna zawartość koszyka</p>
+        <table class="table table-striped">
+            <tr>
+                <th scope="row">#</th>
+                <th scope="row">Nazwa</th>
+                <th scope="row">Ilość</th>
+                <th scope="row">Cena jednostkowa</th>
+            </tr>
+            @{
+                for (int i = 0; i < cart.CartElements.Count(); i++)
+                {
+                    if (cartElements[i].NumberOfProducts != 0)
+                    {
+                        <tr>
+                            <td scope="row">@(i + 1)</td>
+                            <td scope="row">@cartElements[i].Product.ProductName</td>
+                            <td scope="row">@cartElements[i].NumberOfProducts</td>
+                            <td scope="row">@cartElements[i].Product.price zł</td>
+                        </tr>
+                    }
+                }
+            }
+        </table>
+        <div>suma: <p class="p-0 d-inline-block price">@cart.CartElements.Aggregate(0.0, (sum, next) => sum + next.Product.price * next.NumberOfProducts)</p> zł</div>
+        @if (cartElements.Where(x => x.NumberOfProducts > 0).ToList().Count() > 0)
+        {
+            <input type="submit" value="Potwierdź zakupy" class="btn btn-primary" />
+        }
+    </form>
+</section>
+

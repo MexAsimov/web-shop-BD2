@@ -1,0 +1,42 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    var invoices = (Invoices[])ViewData["invoices"];
+}
+<style>
+    .main-wrapper{
+        margin: 20px;
+    }
+</style>
+
+<section>
+    @foreach (Invoices invoice in invoices)
+    {
+        <div class="main-wrapper">
+            <p>Zakupy z dnia: @invoice.InvoiceDate</p>
+            <table class="table table-striped">
+                <tr>
+                    <th scope="row">nazwa</th>
+                    <th scope="row">Ilość</th>
+                    <th scope="row">Cena jednostkowa</th>
+                </tr>
+                @foreach (OrderUnit orderUnit in invoice.OrderUnit)
+                {
+                    if (orderUnit.NumberOfProducts > 0)
+                    {
+                        <tr>
+                            <td scope="row">@orderUnit.Product.ProductName</td>
+                            <td scope="row">@orderUnit.NumberOfProducts</td>
+                            <td scope="row">@orderUnit.unitPrice zł</td>
+                        </tr>
+                    }
+                }
+            </table>
+            <p>suma: @invoice.OrderUnit.Aggregate(0.0, (sum, next) => sum + next.unitPrice * next.NumberOfProducts) zł</p>
+            <hr />
+        </div>
+            
+    }
+
+</section>
+

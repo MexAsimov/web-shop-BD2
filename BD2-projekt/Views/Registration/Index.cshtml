@@ -1,0 +1,144 @@
+﻿@using BD2_projekt
+@{
+    ViewData["Title"] = "Index";
+}
+
+<style>
+    .registration-panel{
+        background-color: #e8e8e8;
+        border-radius: 15px;
+        padding: 10px;
+    }
+
+    .field-wrapper{
+        max-width: 140px;
+        margin-left: 20px;
+        display: inline-block;
+    }
+
+    .inner{
+        max-width: 100%;
+    }
+
+    .d-inline-block > *{
+        display:block;
+    }
+
+    .margin-15{
+        margin: 15px;
+    }
+</style>
+
+<script>
+    var currentType = "";
+
+    function changeType(event) {
+        currentType = event.value;
+        if (currentType == "customer") {
+            document.getElementById("customer").style.display = "block";
+            document.getElementById("distributor").style.display = "none";
+        }
+        else if (currentType == "distributor") {
+            document.getElementById("distributor").style.display = "block";
+            document.getElementById("customer").style.display = "none";
+        }
+    }
+</script>
+
+<section>
+    @{
+        var data = (Error)ViewData["errors"];
+    }
+
+    <form class="w-75 registration-panel m-auto" method="POST" asp-controller="Registration" asp-action="Register">
+        <h3 class="text-center margin-15">Adres</h3>
+        <div>
+            <div class="field-wrapper">
+                <label for="city">miasto</label>
+                <input class="inner" name="city" type="text" />
+            </div>
+            <div class="field-wrapper">
+                <label for="street">ulica</label>
+                <input class="inner" name="street" type="text" />
+            </div>
+            <div class="field-wrapper">
+                <label for="number">numer domu</label>
+                <input class="inner" name="number" type="number" />
+            </div>
+            <div class="field-wrapper">
+                <label for="post-code">kod pocztowy</label>
+                <input class="inner" name="post-code" type="text" placeholder="__-___" />
+            </div>
+            <div class="field-wrapper">
+                <label for="state">kraj</label>
+                <input class="inner" name="state" type="text" />
+            </div>
+        </div>
+        <hr />
+        <h3 class="text-center margin-15">Dane kontaktowe</h3>
+        <div>
+            <div class="field-wrapper">
+                <label for="email">E-mail</label>
+                <input class="inner" name="email" type="email" />
+            </div>
+            <div class="field-wrapper">
+                <label for="phone">numer</label>
+                <input class="inner" name="phone" type="tel" />
+            </div>
+            <div class="field-wrapper">
+                <label for="NIP">numer NIP</label>
+                <input class="inner" name="NIP" type="text" />
+            </div>
+        </div>
+        <hr />
+        <h3 class="text-center margin-15">Typ konta</h3>
+        <div>
+            <label class="margin-15"><input type="radio" name="type" onclick="changeType(this)" value="customer"> Klient</label>
+            <label class="margin-15"><input type="radio" name="type" onclick="changeType(this)" value="distributor"> Dostawca</label>
+        </div>
+        <div id="customer" style="display: none">
+            <div class="field-wrapper">
+                <label for="customer-first-name">Imię</label>
+                <input class="inner" name="customer-first-name" type="text" />
+            </div>
+            <div class="field-wrapper">
+                <label for="customer-last-name">nazwisko</label>
+                <input class="inner" name="customer-last-name" type="text" />
+            </div>
+            <div class="field-wrapper">
+                <label for="customer-card-number">numer karty</label>
+                <input class="inner" name="customer-card-number" type="text" placeholder="____-____-____-____" />
+            </div>
+        </div>
+        <div id="distributor" style="display: none">
+            <div class="field-wrapper">
+                <label for="distributor-company-name">nazwa firmy</label>
+                <input class="inner" name="distributor-company-name" type="text" />
+            </div>
+            <div class="field-wrapper">
+                <label for="distributor-bank-account">numer konta bankowego</label>
+                <input class="inner" name="distributor-bank-account" type="text" />
+            </div>
+        </div>
+        <hr />
+        <h3 class="text-center margin-15">Dane logowania</h3>
+        <div>
+            <div class="field-wrapper">
+                <label for="password">hasło</label>
+                <input class="inner" name="password" type="password" />
+                
+                    @if (data != null)
+                    {
+                        <span style="color: red; font-size:12px;">@data.PassError</span>
+                    }
+               
+            </div>
+            <div class="field-wrapper">
+                <label for="password2">powtórz hasło</label>
+                <input class="inner" name="password2" type="password" />
+            </div>
+        </div>
+        <input type="submit" value="zarejestruj" class="btn btn-primary margin-15" />
+    </form>
+</section>
+

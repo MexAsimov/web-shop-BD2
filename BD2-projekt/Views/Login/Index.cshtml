@@ -1,0 +1,25 @@
+﻿
+@{
+    ViewData["Title"] = "LoginView";
+}
+
+<style>
+    .login-container{
+        background-color :#e8e8e8;
+        border-radius: 15px;
+        padding: 5%;
+    }
+</style>
+
+<section>
+    <div class="w-50 m-auto container mt-lg-5">
+        <form class="text-wrap w-50 container login-container" method="post" asp-controller="Login" asp-action="Login">
+            <label for="login">login</label>
+            <input name="login" type="text"/>
+            <label for="pass">hasło</label>
+            <input name="password" type="password"/>
+            <input type="submit" class="btn btn-primary m-3" value="zaloguj"/>
+            <p>Nie masz konta? Załóż już <a class="nav-link" asp-area="" asp-controller="Registration" asp-action="Index">teraz!</a></p>
+        </form>
+    </div>
+</section>

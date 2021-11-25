@@ -1,0 +1,76 @@
+﻿
+@{
+    ViewData["Title"] = "ProductAdd";
+}
+@{
+    var data = (StoragePlaces[])ViewData["places"];
+    var test = (Distributors)ViewData["test"];
+}
+
+<style>
+    .form-input-wrapper {
+        max-width: 170px;
+        display: inline-block;
+        margin: 10px;
+    }
+
+        .form-input-wrapper > * {
+            max-width: 100%;
+        }
+
+    section {
+        text-align: center;
+        width: 65vw;
+        background-color: #e8e8e8;
+        border-radius: 15px;
+        padding: 10px;
+    }
+</style>
+
+<section>
+
+    <form method="POST" asp-controller="ProductAdd" asp-action="AddProduct">
+        <h3>Opis produktu</h3>
+        <div class="form-input-wrapper">
+            <label for="name">Nazwa</label>
+            <input type="text" name="name" />
+        </div>
+        <div class="form-input-wrapper">
+            <label for="shrt-desc">Krótki opis</label>
+            <input type="text" name="shrt-desc" />
+        </div>
+        <div class="form-input-wrapper">
+            <label for="desc">Opis</label>
+            <textarea name="desc"></textarea>
+        </div>
+        <hr />
+        <h3>Cena</h3>
+        <div class="form-input-wrapper">
+            <input type="number" name="price" />
+        </div>
+        <hr />
+        <h3>Pozostałe Dane</h3>
+        <div class="form-input-wrapper">
+            <label for="unit">Jednostka</label>
+            <select name="unit">
+                <option value="sztuka">sztuka</option>
+                <option value="litr">litr</option>
+            </select>
+        </div>
+        <div class="form-input-wrapper">
+            <label for="quantity">Początkowa ilość</label>
+            <input name="quantity" type="number" />
+        </div>
+        <hr />
+        <h3>Miejsce w magazynie</h3>
+        <div style="margin: 20px;">
+            <select name="place">
+                @for (var i = 0; i < data.Length; i++)
+                {
+                    <option value="@data[i].StoragePlacesID">@data[i].Place, rząd @data[i].Row, sekcja @data[i].Section</option>
+                }
+            </select>
+        </div>
+        <input type="submit" value="Dodaj" class="btn btn-primary" />
+    </form>
+</section>
